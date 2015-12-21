@@ -13,7 +13,7 @@ data EExp = EId String
           | EStr String
           | EAdd EExp EExp
           | EMult EExp EExp
-          | ECon EExp EExp
+          | ECat EExp EExp
           | ELen EExp
           | EDef { value :: EExp
                  , identifier :: String
@@ -21,6 +21,7 @@ data EExp = EId String
                  }
           deriving (Show, Eq)
 
+-- corresponds to Gamma or "typing context"
 type TypeEnv = Map.Map String EType
 
 check' :: EExp -> Either String EType
@@ -28,25 +29,33 @@ check' = check Map.empty
 
 check :: TypeEnv -> EExp -> Either String EType
 check typeEnv expression = case expression of
+  -- 4.1a
   EId stringId -> case Map.lookup stringId typeEnv of
     Just typeValue -> Right typeValue
     Nothing -> Left [i|No match in Type Environment found for: #{stringId}|]
-  ENum _ -> Right TNum
+  -- 4.1b
   EStr _ -> Right TStr
+  -- 4.1c
+  ENum _ -> Right TNum
+  -- 4.1d
   EAdd expr1 expr2 -> do
-    _ <- confirmType TNum expr1
-    confirmType TNum expr2
+     _ <- confirmType TNum expr1
+     confirmType TNum expr2
+  -- 4.1e
   EMult expr1 expr2 -> do
     _ <- confirmType TNum expr1
     confirmType TNum expr2
-  ECon expr1 expr2 -> do
+  -- 4.1f
+  ECat expr1 expr2 -> do
     _ <- confirmType TStr expr1
     confirmType TStr expr2
+  -- 4.1g
   ELen (EStr _) -> Right TNum
   ELen expr@(EId stringId) -> let typeOfExpr = check typeEnv expr
                               in case typeOfExpr of
                                   Right TStr -> Right TNum
                                   e -> Left [i|Can only take length of strings, #{e} was not EStr|]
+  -- 4.1h
   EDef expr1 stringId expr2 ->
     case check typeEnv expr1 of
       Right typeOfExpr1 -> let typeEnv' = Map.insert stringId typeOfExpr1 typeEnv

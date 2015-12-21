@@ -17,8 +17,8 @@ spec =
     it "should return TNum for EMult" $
        check' (EMult (ENum 1) (ENum 1)) `shouldBe` Right TNum
 
-    it "should return TStr for ECon" $
-       check' (ECon (EStr "string") (EStr "string")) `shouldBe` Right TStr
+    it "should return TStr for ECat" $
+       check' (ECat (EStr "string") (EStr "string")) `shouldBe` Right TStr
 
     it "should return TStr for ELen" $
        check' (ELen (EStr "string")) `shouldBe` Right TNum
@@ -34,5 +34,5 @@ spec =
 
        check' (EMult (ENum 1) (EStr "1")) `shouldBe` Left  "EMult (ENum 1) (EStr \"1\") expected EStr \"1\" to be TNum, but was TStr."
 
-       check' (ECon (ENum 1) (EStr "1")) `shouldBe` Left "ECon (ENum 1) (EStr \"1\") expected ENum 1 to be TStr, but was TNum."
- 
+       check' (ECat (ENum 1) (EStr "1")) `shouldBe` Left "ECat (ENum 1) (EStr \"1\") expected ENum 1 to be TStr, but was TNum."
+
