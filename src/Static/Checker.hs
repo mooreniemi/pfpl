@@ -1,5 +1,7 @@
+{-# LANGUAGE QuasiQuotes #-}
 module Static.Checker where
 import qualified Data.Map.Strict as Map
+import Data.String.Interpolate
 
 data EType = TNum
            | TStr
@@ -20,28 +22,30 @@ data EExp = EId String
 
 type TypeEnv = Map.Map String EType
 
-check' :: EExp -> EType
+check' :: EExp -> Either String EType
 check' = check Map.empty
 
-check :: TypeEnv -> EExp -> EType
+check :: TypeEnv -> EExp -> Either String EType
 check typeEnv expression = case expression of
   EId stringId -> case Map.lookup stringId typeEnv of
-    Just typeValue -> typeValue
-    Nothing -> undefined
-  ENum _ -> TNum
-  EStr _ -> TStr
-  EAdd (ENum _) (ENum _) -> TNum
-  EMult (ENum _) (ENum _) -> TNum
-  ECon (EStr _) (EStr _) -> TStr
-  ELen (EStr _) -> TNum
+    Just typeValue -> Right typeValue
+    Nothing -> Left [i|No match in Type Environment found for: #{stringId}|]
+  ENum _ -> Right TNum
+  EStr _ -> Right TStr
+  EAdd (ENum _) (ENum _) -> Right TNum
+  EMult (ENum _) (ENum _) -> Right TNum
+  ECon (EStr _) (EStr _) -> Right TStr
+  ELen (EStr _) -> Right TNum
   ELen expr@(EId stringId) -> let typeOfExpr = check typeEnv expr
                               in case typeOfExpr of
-                                  TStr -> TNum
-                                  e -> error' "Can only take length of strings." e
-  EDef expr1 stringId expr2 -> let typeOfExpr1 = check typeEnv expr1
-                                   typeEnv' = Map.insert stringId typeOfExpr1 typeEnv
-                               in check typeEnv' expr2
-  e -> error' "Failed to match:" e
-
-error' :: Show a => String -> a -> b
-error' message errorValue = error $ message ++ show errorValue
+                                  Right TStr -> Right TNum
+                                  e -> Left [i|Can only take length of strings, #{e} was not EStr|]
+  EDef expr1 stringId expr2 ->
+    case check typeEnv expr1 of
+      Right typeOfExpr1 -> let typeEnv' = Map.insert stringId typeOfExpr1 typeEnv
+                           in check typeEnv' expr2
+      Left e -> Left e
+  EAdd expr1 expr2 -> Left [i|EAdd requires two ENums, but received #{expr1} and #{expr2}|]
+  EMult expr1 expr2 -> Left [i|EMult requires two ENums, but received #{expr1} and #{expr2}|]
+  ECon expr1 expr2 -> Left [i|ECon requires two EStrs, but received #{expr1} and #{expr2}|]
+  e -> Left [i|Failed to match any patterns with: #{e}|] 
