@@ -30,6 +30,8 @@ spec =
        check' (EDef (EStr "string") "x" (ELen (EId "x"))) `shouldBe` Right TNum
 
     it "should return helpful error messages for malformed expressions" $ do
-       check' (EAdd (ENum 1) (EStr "1")) `shouldBe` Left "EAdd requires two ENums, but received ENum 1 and EStr \"1\""
-       check' (EMult (ENum 1) (EStr "1")) `shouldBe` Left "EMult requires two ENums, but received ENum 1 and EStr \"1\""
+       check' (EAdd (ENum 1) (EStr "1")) `shouldBe` Left  "EAdd (ENum 1) (EStr \"1\") expected EStr \"1\" to be TNum, but was TStr."
+
+       check' (EMult (ENum 1) (EStr "1")) `shouldBe` Left  "EMult (ENum 1) (EStr \"1\") expected EStr \"1\" to be TNum, but was TStr."
+
        check' (ECon (ENum 1) (EStr "1")) `shouldBe` Left "ECon requires two EStrs, but received ENum 1 and EStr \"1\""

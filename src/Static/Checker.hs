@@ -2,6 +2,7 @@
 module Static.Checker where
 import qualified Data.Map.Strict as Map
 import Data.String.Interpolate
+import Control.Monad
 
 data EType = TNum
            | TStr
@@ -32,8 +33,12 @@ check typeEnv expression = case expression of
     Nothing -> Left [i|No match in Type Environment found for: #{stringId}|]
   ENum _ -> Right TNum
   EStr _ -> Right TStr
-  EAdd (ENum _) (ENum _) -> Right TNum
-  EMult (ENum _) (ENum _) -> Right TNum
+  EAdd expr1 expr2 -> do
+    _ <- confirmType TNum expr1
+    confirmType TNum expr2
+  EMult expr1 expr2 -> do
+    _ <- confirmType TNum expr1
+    confirmType TNum expr2
   ECon (EStr _) (EStr _) -> Right TStr
   ELen (EStr _) -> Right TNum
   ELen expr@(EId stringId) -> let typeOfExpr = check typeEnv expr
@@ -45,7 +50,13 @@ check typeEnv expression = case expression of
       Right typeOfExpr1 -> let typeEnv' = Map.insert stringId typeOfExpr1 typeEnv
                            in check typeEnv' expr2
       Left e -> Left e
-  EAdd expr1 expr2 -> Left [i|EAdd requires two ENums, but received #{expr1} and #{expr2}|]
-  EMult expr1 expr2 -> Left [i|EMult requires two ENums, but received #{expr1} and #{expr2}|]
   ECon expr1 expr2 -> Left [i|ECon requires two EStrs, but received #{expr1} and #{expr2}|]
-  e -> Left [i|Failed to match any patterns with: #{e}|] 
+  e -> Left [i|Failed to match any patterns with: #{e}|]
+  where
+    confirmType :: EType -> EExp -> Either String EType
+    confirmType desiredType expr = do
+      typeOfExpr <- check typeEnv expr
+      when (typeOfExpr /= desiredType) $
+        Left [i|#{expression} expected #{expr} to be #{desiredType}, but was #{typeOfExpr}.|]
+      return typeOfExpr
+
