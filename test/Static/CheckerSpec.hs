@@ -34,4 +34,5 @@ spec =
 
        check' (EMult (ENum 1) (EStr "1")) `shouldBe` Left  "EMult (ENum 1) (EStr \"1\") expected EStr \"1\" to be TNum, but was TStr."
 
-       check' (ECon (ENum 1) (EStr "1")) `shouldBe` Left "ECon requires two EStrs, but received ENum 1 and EStr \"1\""
+       check' (ECon (ENum 1) (EStr "1")) `shouldBe` Left "ECon (ENum 1) (EStr \"1\") expected ENum 1 to be TStr, but was TNum."
+ 

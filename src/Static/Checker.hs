@@ -39,7 +39,9 @@ check typeEnv expression = case expression of
   EMult expr1 expr2 -> do
     _ <- confirmType TNum expr1
     confirmType TNum expr2
-  ECon (EStr _) (EStr _) -> Right TStr
+  ECon expr1 expr2 -> do
+    _ <- confirmType TStr expr1
+    confirmType TStr expr2
   ELen (EStr _) -> Right TNum
   ELen expr@(EId stringId) -> let typeOfExpr = check typeEnv expr
                               in case typeOfExpr of
@@ -50,7 +52,6 @@ check typeEnv expression = case expression of
       Right typeOfExpr1 -> let typeEnv' = Map.insert stringId typeOfExpr1 typeEnv
                            in check typeEnv' expr2
       Left e -> Left e
-  ECon expr1 expr2 -> Left [i|ECon requires two EStrs, but received #{expr1} and #{expr2}|]
   e -> Left [i|Failed to match any patterns with: #{e}|]
   where
     confirmType :: EType -> EExp -> Either String EType
