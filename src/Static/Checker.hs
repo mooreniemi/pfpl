@@ -23,6 +23,7 @@ data EExp = EId String
 
 -- corresponds to Gamma or "typing context"
 type TypeEnv = Map.Map String EType
+-- Map ensures Lemma 4.1 (Unicity of typing)
 
 check' :: EExp -> Either String EType
 check' = check Map.empty
