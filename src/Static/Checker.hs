@@ -1,4 +1,6 @@
 {-# LANGUAGE QuasiQuotes #-}
+-- pragma necessary for string interpolation via Interpolate
+
 module Static.Checker where
 import qualified Data.Map.Strict as Map
 import Data.String.Interpolate
@@ -8,6 +10,11 @@ data EType = TNum
            | TStr
            deriving (Show, Eq)
 
+-- introductory forms for a type determine the values, or canonical forms, of that type
+-- ie ENum & EStr
+-- eliminatory forms for a type determine how to manipulate the values
+-- of a type to form a computation of another (possibly the same) type
+-- ie EMult & EAdd for nums, and ECat and ELen for strings
 data EExp = EId String
           | ENum Int
           | EStr String
