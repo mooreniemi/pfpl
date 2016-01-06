@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Static.Checker
+  exposed-modules:     Static.Checker, Dynamic.Structural
   build-depends:       base >= 4.7 && < 5
                      , containers
                      , interpolate
