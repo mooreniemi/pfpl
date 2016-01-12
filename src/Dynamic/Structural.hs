@@ -7,11 +7,13 @@ interpret ast = case ast of
                   (EStr string) -> EStr string
                   (EAdd (ENum first) (ENum second)) -> ENum (first + second)
                   (ECat (EStr first) (EStr second)) -> EStr (first ++ second)
-                  (ECat (e1) (EStr second)) -> interpret ((ECat (interpret e1) (EStr second)))
-                  (ECat (EStr first) (e2)) -> interpret ((ECat (EStr first) (interpret e2)))
-                  _ -> normalize ast 
+                  (EDef (EStr value) identifier (EId body)) -> EStr value
+                  (EDef (ENum value) identifier (EId body)) -> ENum value
+                  _ -> normalize ast
                   where
                     normalize :: EExp -> EExp
                     normalize expression = case expression of
                                              EAdd e1 e2 -> interpret (EAdd (interpret e1) (interpret e2))
+                                             ECat e1 e2 -> interpret (ECat (interpret e1) (interpret e2))
+                                             (EDef value identifier exp) -> interpret (EDef value identifier (interpret exp))
                                              _ -> undefined

@@ -22,3 +22,10 @@ spec =
          interpret (EAdd (ENum 2) (EAdd (ENum 1) (ENum 1))) `shouldBe` ENum 4
       it "should do transition on sub1 str first" $ do
          interpret (ECat (ECat (EStr "hel") (EStr "lo")) (EStr " world")) `shouldBe` EStr "hello world"
+    describe "defs should become transparent over values" $ do
+       it "a wrapped string is just a string" $ do
+         interpret (EDef (EStr "string") "x" (EId "x")) `shouldBe` EStr "string"
+       it "a wrapped int is just an int" $ do
+          interpret (EDef (ENum 10) "y" (EId "y")) `shouldBe` ENum 10
+       it "allow for higher expressions" $ do
+          interpret (EDef (ENum 1) "one" (EAdd (ENum 1) (EId "one"))) `shouldBe` ENum 2
