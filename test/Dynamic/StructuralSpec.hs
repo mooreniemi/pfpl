@@ -13,3 +13,12 @@ spec =
          interpret (EStr "value") `shouldBe` EStr "value"
       it "should reduce addition AST" $ do
          interpret (EAdd (ENum 10) (ENum 10)) `shouldBe` ENum 20
+      it "should reduce concatenation AST" $ do
+         interpret (ECat (EStr "me") (EStr "ow")) `shouldBe` EStr "meow"
+    describe "should evaluate any subexpressions" $ do
+      it "should do transition on sub1 first" $ do
+         interpret (EAdd (EAdd (ENum 1) (ENum 1)) (ENum 2)) `shouldBe` ENum 4
+      it "or sub2 first" $ do
+         interpret (EAdd (ENum 2) (EAdd (ENum 1) (ENum 1))) `shouldBe` ENum 4
+      it "should do transition on sub1 str first" $ do
+         interpret (ECat (ECat (EStr "hel") (EStr "lo")) (EStr " world")) `shouldBe` EStr "hello world"
