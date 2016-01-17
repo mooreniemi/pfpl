@@ -16,10 +16,12 @@ interpret ast = case ast of
                                              ECat e1 e2 -> interpret (ECat (interpret e1) (interpret e2))
                                              (EDef value identifier expBody) -> case expBody of
                                                    EId _ -> value
-                                                   _ -> interpret (substitute value identifier expBody)
+                                                   -- we chuck out the identifier here as we only have one
+                                                   -- only one EId in an EDef
+                                                   _ -> interpret (substitute value expBody)
                                                    where
-                                                        substitute :: EExp -> [Char] -> EExp -> EExp
-                                                        substitute x i b = case b of
+                                                        substitute :: EExp -> EExp -> EExp
+                                                        substitute x b = case b of
                                                           (EAdd (ENum e1) (EId _)) -> (EAdd (ENum e1) x)
                                                           (EAdd (EId _) (ENum e2)) -> (EAdd x (ENum e2))
                                                           (EMult (ENum e1) (EId _)) -> (EMult (ENum e1) x)
