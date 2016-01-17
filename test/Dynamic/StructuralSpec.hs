@@ -33,3 +33,6 @@ spec =
        it "allow for higher expressions, or multiplication operation" $ do
           interpret (EDef (ENum 3) "three" (EMult (ENum 1) (EId "three"))) `shouldBe` ENum 3
           interpret (EDef (ENum 3) "three" (EMult (EId "three") (ENum 1))) `shouldBe` ENum 3
+    describe "nested definitions should become transparent recursively" $ do
+        it "will surface more than one binding" $ do
+           interpret (EDef (EDef (ENum 4) "four" (EId "four")) "fourPrime" (EAdd (ENum 1) (EId "fourPrime"))) `shouldBe` ENum 5
