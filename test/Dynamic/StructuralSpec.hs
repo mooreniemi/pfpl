@@ -29,5 +29,6 @@ spec =
           interpret (EDef (ENum 10) "y" (EId "y")) `shouldBe` ENum 10
        it "allow for higher expressions, like addition operation" $ do
           interpret (EDef (ENum 1) "one" (EAdd (ENum 1) (EId "one"))) `shouldBe` ENum 2
+          interpret (EDef (ENum 1) "one" (EAdd (EId "one") (ENum 1))) `shouldBe` ENum 2
        it "allow for higher expressions, or multiplication operation" $ do
           interpret (EDef (ENum 3) "three" (EMult (ENum 1) (EId "three"))) `shouldBe` ENum 3

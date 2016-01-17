@@ -6,6 +6,7 @@ interpret ast = case ast of
                   (ENum digit) -> ENum digit
                   (EStr string) -> EStr string
                   (EAdd (ENum first) (ENum second)) -> ENum (first + second)
+                  (EMult (ENum first) (ENum second)) -> ENum (first * second)
                   (ECat (EStr first) (EStr second)) -> EStr (first ++ second)
                   _ -> normalize ast
                   where
