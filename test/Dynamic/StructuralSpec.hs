@@ -27,5 +27,7 @@ spec =
          interpret (EDef (EStr "string") "x" (EId "x")) `shouldBe` EStr "string"
        it "a wrapped int is just an int" $ do
           interpret (EDef (ENum 10) "y" (EId "y")) `shouldBe` ENum 10
-       it "allow for higher expressions" $ do
+       it "allow for higher expressions, like addition operation" $ do
           interpret (EDef (ENum 1) "one" (EAdd (ENum 1) (EId "one"))) `shouldBe` ENum 2
+       it "allow for higher expressions, or multiplication operation" $ do
+          interpret (EDef (ENum 3) "three" (EMult (ENum 1) (EId "three"))) `shouldBe` ENum 3
